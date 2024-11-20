@@ -1,0 +1,10 @@
+[package]
+name = "space_travel_cg"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+nalgebra-glm = "0.19.0"
+tobj = "4.0.2"
+minifb = "0.27.0"
+fastnoise-lite = "1.1.1"
