@@ -1,4 +1,5 @@
 use crate::fragments::{triangle_fill, Fragment};
+use crate::shader::fragment_shader;
 use crate::vertex::Vertex;
 use crate::{screen::framebuffer::Framebuffer, shader::{vertex_shader}};
 use nalgebra_glm::{Mat4, Vec3};
@@ -39,13 +40,12 @@ pub fn render(framebuffer: &mut Framebuffer, uniforms: &Uniforms, vertex_array: 
     for tri in triangles {
         fragments.extend(triangle_fill(&tri[0], &tri[1], &tri[2], uniforms));
     }
-    let color = Color::new(255,255,255);
     // Fragment Processing Stage
     for fragment in fragments {
         let x = fragment.position.x as usize;
         let y = fragment.position.y as usize;
 
-        let shaded_color = color*fragment.intensity;
+        let shaded_color = fragment_shader(&fragment, uniforms);
         framebuffer.set_current_color(Color::to_hex(&shaded_color));
         framebuffer.point(x, y, fragment.depth);
     }

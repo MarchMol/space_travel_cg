@@ -1,10 +1,9 @@
-use std::f32::consts::PI;
-use std::ops::Add;
-use std::os::unix::raw::gid_t;
 
-use nalgebra_glm::{Mat3, Mat4, Vec3, Vec4};
-use crate::fragments::Fragment;
+use nalgebra_glm::{dot, Mat3, Mat4, Vec3, Vec4};
+use crate::fragments::{self, Fragment};
+use crate::normal_map::{with_normal_map, NormalMap};
 use crate::screen::color::{self, Color};
+use crate::texture::{self, with_texture, Texture};
 use crate::uniforms::Uniforms;
 use crate::vertex::Vertex;
 
@@ -51,4 +50,25 @@ pub fn vertex_shader(
     transformed_position: Vec3::new(screen_position.x, screen_position.y, screen_position.z),
     transformed_normal,
   }
+}
+
+pub fn fragment_shader(fragment :&Fragment, uniforms: &Uniforms)->Color{
+  let intensity = calculate_lightning(fragment, uniforms);
+  let texture_color = get_fragment_texture(fragment, uniforms);
+  texture_color*(intensity.max(0.2).min(2.0))
+}
+
+pub fn get_fragment_texture(fragment: &Fragment, uniforms: &Uniforms)->Color{
+  let base_color = with_texture(&|texture: &Texture|{
+    texture.sample(fragment.texture_pos.x, fragment.texture_pos.y)
+  });
+  base_color
+}
+
+pub fn calculate_lightning(fragment:&Fragment, uniforms: &Uniforms)->f32{
+  let normal_from_map = with_normal_map(|normal_map: &NormalMap|{
+    normal_map.sample(fragment.texture_pos.x, fragment.texture_pos.y)
+  });
+  let modified_normal = (fragment.normal + normal_from_map).normalize();
+  dot(&modified_normal, &uniforms.light_dir)
 }

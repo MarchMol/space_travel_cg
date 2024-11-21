@@ -1,12 +1,14 @@
 use std::time::Duration;
 use minifb::{Key, Window, WindowOptions};
 use nalgebra_glm::{look_at, perspective, Mat4, Vec1, Vec3};
+use normal_map::init_normal_map;
 use screen::framebuffer;
 use obj::Obj;
 use uniforms::Uniforms;
 use std::f32::consts::PI;
 use camera::Camera;
 use fastnoise_lite::{self, CellularDistanceFunction, DomainWarpType, FastNoiseLite, FractalType, NoiseType};
+use texture::{init_texture, Texture};
 
 mod screen;
 mod vertex;
@@ -16,6 +18,8 @@ mod uniforms;
 mod shader;
 mod bounding_box;
 mod camera;
+mod texture;
+mod normal_map;
 
 fn main() {
     // Window
@@ -39,9 +43,12 @@ fn main() {
 
     // Obj
     // Normal Planet
-    let planet =  Obj::load("./assets/3d_models/sphere.obj").expect("Failed to load obj");
+    let planet =  Obj::load("./assets/3d_models/planet.obj").expect("Failed to load obj");
     let vertex_array = planet.get_vertex_array();
-    let light_dir= Vec3::new(1.0, 3.0, -4.0);
+
+    init_texture("./assets/textures/earth.jpg").expect("Failed to load texture");
+    init_normal_map("./assets/textures/earth_np.jpg").expect("Failed to load normal map");
+    let light_dir= Vec3::new(10.0, 8.0, -10.0);
     // Model
     let translation = Vec3::new(0.0, 0.0, 0.0);
     let rotation = Vec3::new(0.0, 0.0, 0.0);
