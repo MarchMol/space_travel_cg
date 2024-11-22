@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use nalgebra_glm::Vec3;
-use once_cell::sync::{Lazy, OnceCell};
+use once_cell::sync::Lazy;
 use crate::screen::color::Color;
 
 static TEXTURES: Lazy<Mutex<HashMap<String, Arc<Texture>>>> = Lazy::new(|| Mutex::new(HashMap::new()));

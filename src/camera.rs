@@ -1,4 +1,4 @@
-use nalgebra_glm::{Vec3, rotate_vec3};
+use nalgebra_glm::Vec3;
 use std::f32::consts::PI;
 
 pub struct Camera {
@@ -16,19 +16,6 @@ impl Camera {
       up,
       has_changed: true,
     }
-  }
-
-  pub fn basis_change(&self, vector: &Vec3) -> Vec3 {
-    let forward = (self.center - self.eye).normalize();
-    let right = forward.cross(&self.up).normalize();
-    let up = right.cross(&forward).normalize();
-
-    let rotated = 
-    vector.x * right +
-    vector.y * up +
-    - vector.z * forward;
-
-    rotated.normalize()
   }
 
   pub fn orbit(&mut self, delta_yaw: f32, delta_pitch: f32) {
@@ -57,30 +44,5 @@ impl Camera {
     let direction = (self.center - self.eye).normalize();
     self.eye += direction * delta;
     self.has_changed = true;
-  }
-
-  pub fn move_center(&mut self, direction: Vec3) {
-    let radius_vector = self.center - self.eye;
-    let radius = radius_vector.magnitude();
-
-    let angle_x = direction.x * 0.05; // Adjust this factor to control rotation speed
-    let angle_y = direction.y * 0.05;
-
-    let rotated = rotate_vec3(&radius_vector, angle_x, &Vec3::new(0.0, 1.0, 0.0));
-
-    let right = rotated.cross(&self.up).normalize();
-    let final_rotated = rotate_vec3(&rotated, angle_y, &right);
-
-    self.center = self.eye + final_rotated.normalize() * radius;
-    self.has_changed = true;
-  }
-
-  pub fn check_if_changed(&mut self) -> bool {
-    if self.has_changed {
-      self.has_changed = false;
-      true
-    } else {
-      false
-    }
   }
 }

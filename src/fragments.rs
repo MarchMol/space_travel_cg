@@ -1,35 +1,29 @@
 use core::f32;
 
-use nalgebra_glm::{dot, Vec2, Vec3};
+use nalgebra_glm::{Vec2, Vec3};
 use crate::bounding_box::{barycentric_coordinates, calculate_bounding_box, edge_function};
-use crate::screen::color::Color;
-use crate::uniforms::Uniforms;
 use crate::vertex::Vertex;
 
 #[derive(Debug)]
 pub struct Fragment {
     pub position: Vec2,
-    pub color: Color,
     pub depth: f32,
     pub normal: Vec3,
-    pub intensity: f32,
     pub texture_pos: Vec2
 }
 
 impl Fragment {
-    pub fn new(x: f32, y: f32, color: Color, depth: f32, normal:Vec3, intensity: f32, texture_pos: Vec2) -> Self {
+    pub fn new(x: f32, y: f32, depth: f32, normal:Vec3, texture_pos: Vec2) -> Self {
         Fragment {
             position: Vec2::new(x, y),
-            color,
             depth,
             normal,
-            intensity,
             texture_pos,
         }
     }
 }
 
-pub fn triangle_fill(v1: &Vertex, v2:&Vertex ,v3:&Vertex, uniforms: &Uniforms)-> Vec<Fragment>{
+pub fn triangle_fill(v1: &Vertex, v2:&Vertex ,v3:&Vertex)-> Vec<Fragment>{
     let mut fragments = Vec::new();
     let (a,b,c) = (v1.transformed_position,v2.transformed_position, v3.transformed_position);
 
@@ -52,7 +46,6 @@ pub fn triangle_fill(v1: &Vertex, v2:&Vertex ,v3:&Vertex, uniforms: &Uniforms)->
                 if w1>=0.0 && w1 <=1.0 &&
                 w2>=0.0 && w2 <=1.0 &&
                 w3>=0.0 && w3 <=1.0 {
-                    let color = Color::new(100, 100, 100);
                     let depth = a.z*w1 +b.z*w2 + c.z*w3;
                     let old_normal = v1.transformed_normal*w1+v2.transformed_normal *w2 + v3.transformed_normal*w3;
                     let normal = old_normal.normalize();
@@ -60,10 +53,8 @@ pub fn triangle_fill(v1: &Vertex, v2:&Vertex ,v3:&Vertex, uniforms: &Uniforms)->
                         Fragment::new(
                             x as f32, 
                             y as f32, 
-                            color, 
                             depth, 
                             normal, 
-                            0.0,
                             Vec2::new(u,v)
                         )
                     );

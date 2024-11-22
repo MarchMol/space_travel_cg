@@ -1,14 +1,10 @@
-use std::f32::consts::PI;
-use std::f32::INFINITY;
-
-use crate::camera::Camera;
 use crate::fragments::{triangle_fill, Fragment};
 use crate::screen::color::Color;
-use crate::shader::{fragment_shader};
+use crate::shader::fragment_shader;
 use crate::vertex::Vertex;
 use crate::CelestialBody;
 use crate::{screen::framebuffer::Framebuffer, shader::vertex_shader};
-use nalgebra_glm::{mat4_to_mat3, trunc, Mat4, Vec3, Vec4};
+use nalgebra_glm::{Mat4, Vec3};
 pub struct Uniforms {
     pub model_matrix: Mat4,
     pub view_matrix: Mat4,
@@ -16,8 +12,7 @@ pub struct Uniforms {
     pub viewport_matrix: Mat4,
     pub time: u32,
     pub celestial_body: CelestialBody,
-    pub looking_dir: Vec3,
-    pub eye_pos: Vec3,
+    pub looking_dir: Vec3
 }
 
 impl Uniforms {
@@ -115,7 +110,7 @@ pub fn render(framebuffer: &mut Framebuffer, uniforms: &Uniforms, vertex_array: 
 
     let mut fragments: Vec<Fragment> = Vec::new();
     for tri in triangles {
-        fragments.extend(triangle_fill(&tri[0], &tri[1], &tri[2], uniforms));
+        fragments.extend(triangle_fill(&tri[0], &tri[1], &tri[2]));
     }
     // Fragment Processing Stage
     for fragment in fragments {

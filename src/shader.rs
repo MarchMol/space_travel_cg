@@ -1,11 +1,9 @@
 
-use std::f32::consts::PI;
-
-use nalgebra_glm::{dot, mat4_to_mat3, Mat3, Mat4, Vec2, Vec3, Vec4};
-use crate::fragments::{self, Fragment};
+use nalgebra_glm::{dot, mat4_to_mat3, Mat3, Vec3, Vec4};
+use crate::fragments::Fragment;
 use crate::normal_map::{with_normal_map, NormalMap};
-use crate::screen::color::{self, Color};
-use crate::texture::{self, with_texture, Texture};
+use crate::screen::color::Color;
+use crate::texture::{with_texture, Texture};
 use crate::uniforms::Uniforms;
 use crate::vertex::Vertex;
 

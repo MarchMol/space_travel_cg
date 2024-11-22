@@ -50,9 +50,9 @@ impl Framebuffer {
         }).collect()  // Collect into a Vec<u32>
     }
 
-    pub fn set_bgcolor(&mut self, color: u32){
-        self.background_color = Color::from_hex(color);
-    }
+    // pub fn set_bgcolor(&mut self, color: u32){
+    //     self.background_color = Color::from_hex(color);
+    // }
 
     pub fn set_current_color(&mut self, color: u32){
         self.current_color = Color::from_hex(color);
