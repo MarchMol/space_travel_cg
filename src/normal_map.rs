@@ -1,9 +1,9 @@
-use std::sync::Arc;
-use once_cell::sync::OnceCell;
 use nalgebra_glm::Vec3;
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
+use once_cell::sync::Lazy;
 
-static NORMAL_MAP: OnceCell<Arc<NormalMap>> = OnceCell::new();
-
+static NORMAL_MAPS: Lazy<Mutex<HashMap<String, Arc<NormalMap>>>> = Lazy::new(|| Mutex::new(HashMap::new()));
 #[derive(Clone, Debug)]
 pub struct NormalMap {
     width: u32,
@@ -42,15 +42,16 @@ impl NormalMap {
     }
 }
 
-pub fn init_normal_map(path: &str) -> Result<(), image::ImageError> {
+pub fn init_normal_map(id: &str,path: &str) -> Result<(), image::ImageError> {
     let normal_map = NormalMap::new(path)?;
-    NORMAL_MAP.set(Arc::new(normal_map))
-        .expect("Normal map already initialized");
+
+    let mut normal_maps = NORMAL_MAPS.lock().unwrap();
+    normal_maps.insert(id.to_string(), Arc::new(normal_map));
     Ok(())
 }
 
-pub fn with_normal_map(f: impl FnOnce(&NormalMap) -> Vec3) -> Vec3 {
-    let normal_map = NORMAL_MAP.get()
-        .expect("Normal map not initialized");
-    f(normal_map)
+pub fn with_normal_map(id: &str, f: impl FnOnce(&NormalMap) -> Vec3) -> Vec3 {
+    let normal_maps = NORMAL_MAPS.lock().unwrap();
+    let normal_map = normal_maps.get(id).expect("Normal map not initialized");
+    f(&normal_map)
 }

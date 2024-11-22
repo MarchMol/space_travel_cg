@@ -54,9 +54,8 @@ pub fn triangle_fill(v1: &Vertex, v2:&Vertex ,v3:&Vertex, uniforms: &Uniforms)->
                 w3>=0.0 && w3 <=1.0 {
                     let color = Color::new(100, 100, 100);
                     let depth = a.z*w1 +b.z*w2 + c.z*w3;
-                    let normal = v1.transformed_normal*w1+v2.transformed_normal *w2 + v3.transformed_normal*w3;
-                    let normal = normal.normalize();
-                    let intensity = dot(&normal, &uniforms.light_dir);
+                    let old_normal = v1.transformed_normal*w1+v2.transformed_normal *w2 + v3.transformed_normal*w3;
+                    let normal = old_normal.normalize();
                     fragments.push(
                         Fragment::new(
                             x as f32, 
@@ -64,7 +63,7 @@ pub fn triangle_fill(v1: &Vertex, v2:&Vertex ,v3:&Vertex, uniforms: &Uniforms)->
                             color, 
                             depth, 
                             normal, 
-                            intensity, 
+                            0.0,
                             Vec2::new(u,v)
                         )
                     );

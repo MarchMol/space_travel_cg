@@ -1,8 +1,12 @@
-use std::sync::Arc;
-use once_cell::sync::OnceCell;
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
+use nalgebra_glm::Vec3;
+use once_cell::sync::{Lazy, OnceCell};
 use crate::screen::color::Color;
 
-static TEXTURE: OnceCell<Arc<Texture>> = OnceCell::new();
+static TEXTURES: Lazy<Mutex<HashMap<String, Arc<Texture>>>> = Lazy::new(|| Mutex::new(HashMap::new()));
+
+
 
 #[derive(Clone, Debug)]
 pub struct Texture {
@@ -38,15 +42,17 @@ impl Texture {
     }
 }
 
-pub fn init_texture(path: &str) -> Result<(), image::ImageError> {
+// Initialize and store a texture with a given identifier
+pub fn init_texture(id: &str, path: &str) -> Result<(), image::ImageError> {
     let texture = Texture::new(path)?;
-    TEXTURE.set(Arc::new(texture))
-        .expect("Texture already initialized");
+    let mut textures = TEXTURES.lock().unwrap();
+    textures.insert(id.to_string(), Arc::new(texture));
     Ok(())
 }
 
-pub fn with_texture(f: impl FnOnce(&Texture) -> Color) -> Color {
-    let texture = TEXTURE.get()
-        .expect("Texture not initialized");
+// Retrieve a texture by its identifier and apply a function to it
+pub fn with_texture(id: &str, f: impl FnOnce(&Texture) -> Color) -> Color {
+    let textures = TEXTURES.lock().unwrap();
+    let texture = textures.get(id).expect("Texture not initialized");
     f(texture)
 }
